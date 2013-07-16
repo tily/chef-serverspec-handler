@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 <%-
-# TODO: ifconfig, scm, git, subversion, chef_gem, gem_package, easy_install_package
+# TODO: route, ifconfig, scm, git, subversion, chef_gem, gem_package, easy_install_package
 -%>
 
 describe '<%= cookbook %>::<%= recipe %>' do
@@ -54,7 +54,7 @@ describe '<%= cookbook %>::<%= recipe %>' do
     }
    end
   <%- elsif resource.class == Chef::Resource::Link -%>
-  context file('<%= resource.name %>') do
+  context file('<%= resource.target_file %>') do
     it { should be_linked_to '<%= resource.to %>' } 
   end
   <%- elsif resource.class == Chef::Resource::User -%>
@@ -72,10 +72,6 @@ describe '<%= cookbook %>::<%= recipe %>' do
     <%- end -%>
   end
   <%- elsif resource.class == Chef::Resource::Cron -%>
-  context cron do
-    it { should have_entry('').with_user('mizzy') }
-  end
-  <%- elsif resource.class == Chef::Resource::Route -%>
   context cron do
     it { should have_entry('').with_user('mizzy') }
   end
