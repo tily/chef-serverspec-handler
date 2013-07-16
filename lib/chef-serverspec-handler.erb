@@ -1,0 +1,22 @@
+require 'spec_helper'
+
+<%- resources.each do |resource| -%>
+  <%- if resource.class == Chef::Resource::File -%>
+describe file('<%= resource.name %>') do
+  it { should be_file }
+end
+  <%- elsif resource.class == Chef::Resource::Template -%>
+describe file('<%= resource.path %>') do
+  it { should be_file }
+end
+  <%- elsif resource.class == Chef::Resource::Service -%>
+describe file('<%= resource.path %>') do
+  it { should be_file }
+end
+  <%- elsif resource.class == Chef::Resource::Package -%>
+describe package('<%= resource.name %>') do
+  it { should be_installed }
+end
+  <%- end -%>
+
+<%- end -%>
