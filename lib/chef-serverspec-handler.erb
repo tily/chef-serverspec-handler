@@ -1,22 +1,86 @@
 require 'spec_helper'
 
+<%-
+# TODO: ifconfig, scm, git, subversion, chef_gem, gem_package, easy_install_package
+-%>
+
+describe '<%= cookbook %>::<%= recipe %>' do
 <%- resources.each do |resource| -%>
-  <%- if resource.class == Chef::Resource::File -%>
-describe file('<%= resource.name %>') do
-  it { should be_file }
-end
-  <%- elsif resource.class == Chef::Resource::Template -%>
-describe file('<%= resource.path %>') do
-  it { should be_file }
-end
+  <%-
+    if [
+      Chef::Resource::File, 
+      Chef::Resource::CookbookFile,
+      Chef::Resource::RemoteFile,
+      Chef::Resource::Directory,
+      Chef::Resource::RemoteDirectory,
+      Chef::Resource::Template
+    ].include?(resource.class)
+  -%>
+  context file('<%= resource.path %>') do
+    it { should be_file }
+    <%- if resource.content -%>
+    it { should contain '<%= resource.content %>' }
+    <%- end -%> 
+    <%- if resource.mode -%>
+    it { should be_mode <%= resource.mode.to_s(8).to_i %> }
+    <%- end -%>
+    <%- if resource.owner -%>
+    it { should be_owned_by '<%= resource.owner %>' %> }
+    <%- end -%>
+    <%- if resource.group -%>
+    it { should be_group_into '<%= resource.group %>' %> }
+    <%- end -%>
+    <%- if resource.checksum -%>
+    it { should match_md5checksum '<%= resource.checksum %>' %> }
+    <%- end -%>
+  end
+  <%-
+    elsif [
+      Chef::Resource::Package,
+      Chef::Resource::AptPackage,
+      Chef::Resource::DpkgPackage,
+      Chef::Resource::YumPackage,
+      Chef::Resource::RpmPackage
+    ].include?(resource.class)
+  -%>
+  context package('<%= resource.name %>') do
+    it { should be_installed }
+  end
+  <%- elsif resource.class == Chef::Resource::Mount -%>
+  context file('/') do
+    it {
+      should be_mounted_with(
+      )
+    }
+   end
+  <%- elsif resource.class == Chef::Resource::Link -%>
+  context file('<%= resource.name %>') do
+    it { should be_linked_to '<%= resource.to %>' } 
+  end
+  <%- elsif resource.class == Chef::Resource::User -%>
+  context file('<%= resource.path %>') do
+  end
+  <%- elsif resource.class == Chef::Resource::Group -%>
+  context file('<%= resource.path %>') do
+  end
   <%- elsif resource.class == Chef::Resource::Service -%>
-describe file('<%= resource.path %>') do
-  it { should be_file }
-end
-  <%- elsif resource.class == Chef::Resource::Package -%>
-describe package('<%= resource.name %>') do
-  it { should be_installed }
-end
+  context file('<%= resource.path %>') do
+    <%- if [resource.action].flatten == 'enable' -%>
+    it { should be_enabled }
+    <%- elsif [resource.action].flatten == 'start' -%>
+    it { should be_running }
+    <%- end -%>
+  end
+  <%- elsif resource.class == Chef::Resource::Cron -%>
+  context cron do
+    it { should have_entry('').with_user('mizzy') }
+  end
+  <%- elsif resource.class == Chef::Resource::Route -%>
+  context cron do
+    it { should have_entry('').with_user('mizzy') }
+  end
   <%- end -%>
 
 <%- end -%>
+end
+
