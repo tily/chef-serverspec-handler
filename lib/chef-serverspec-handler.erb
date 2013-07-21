@@ -1,9 +1,5 @@
 require 'spec_helper'
 
-<%-
-# TODO: route, ifconfig, scm, git, subversion, chef_gem, gem_package, easy_install_package
--%>
-
 describe '<%= cookbook %>::<%= recipe %>' do
 <%- resources.each do |resource| -%>
   <%-
@@ -18,20 +14,25 @@ describe '<%= cookbook %>::<%= recipe %>' do
   -%>
   context file('<%= resource.path %>') do
     it { should be_file }
-    <%- if resource.content -%>
-    it { should contain '<%= resource.content %>' }
-    <%- end -%> 
+    <%- if resource.respond_to?(:content) && resource.content -%>
+    it { should contain <<-EOF
+<%= resource.content %>
+    EOF
+    }
+    <%- end -%>
     <%- if resource.mode -%>
-    it { should be_mode <%= resource.mode.to_s(8).to_i %> }
+    it { should be_mode <%= resource.mode.to_i %> }
     <%- end -%>
     <%- if resource.owner -%>
-    it { should be_owned_by '<%= resource.owner %>' %> }
+    it { should be_owned_by '<%= resource.owner %>' }
     <%- end -%>
     <%- if resource.group -%>
-    it { should be_group_into '<%= resource.group %>' %> }
+    it { should be_group_into '<%= resource.group %>' }
     <%- end -%>
-    <%- if resource.checksum -%>
-    it { should match_md5checksum '<%= resource.checksum %>' %> }
+    <%- if resource.respond_to?(:variables) && resource.variables && resource.variables.values.size > 0 %>
+      <%- resource.variables.each_value do |value| -%>
+    it { should contain '<%= value %>' }
+      <%- end -%>
     <%- end -%>
   end
   <%-
@@ -58,16 +59,18 @@ describe '<%= cookbook %>::<%= recipe %>' do
     it { should be_linked_to '<%= resource.to %>' } 
   end
   <%- elsif resource.class == Chef::Resource::User -%>
-  context file('<%= resource.path %>') do
+  context user('<%= resource.username %>') do
+    it { should exist }
   end
   <%- elsif resource.class == Chef::Resource::Group -%>
-  context file('<%= resource.path %>') do
+  context group('<%= resource.group_name %>') do
+    it { should exist }
   end
   <%- elsif resource.class == Chef::Resource::Service -%>
-  context file('<%= resource.path %>') do
-    <%- if [resource.action].flatten == 'enable' -%>
+  context service('<%= resource.service_name %>') do
+    <%- if regular_actions(resource).include?(:enable) -%>
     it { should be_enabled }
-    <%- elsif [resource.action].flatten == 'start' -%>
+    <%- elsif regular_actions(resource).include?(:start) -%>
     it { should be_running }
     <%- end -%>
   end
