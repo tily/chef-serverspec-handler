@@ -23,7 +23,7 @@ Then run chef with --whyrun option (for not affecting your working system):
 `chef-serverspec-handler` will be called at the end of the chef run, and generates serverspec examples to
 `/path/to/dir`.
 
- * chef recipe
+input (chef recipe):
 
     template '/var/tmp/template.txt' do
       source 'template.txt.erb'
@@ -34,7 +34,7 @@ Then run chef with --whyrun option (for not affecting your working system):
       action :create
     end
 
- * severspec example
+output (severspec example):
 
     context file('/var/tmp/template.txt') do
       it {
