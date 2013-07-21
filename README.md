@@ -49,8 +49,8 @@ output (severspec example):
 
 For more example, see below:
 
- * [input chef recipe]()
- * [output serverspec example]()
+ * [input chef recipe](https://github.com/tily/chef-serverspec-handler/blob/master/generated-spec/cookbooks/chef_serverspec_handler_test/recipes/default.rb)
+ * [output serverspec example](https://github.com/tily/chef-serverspec-handler/blob/master/generated-spec/spec/localhost/chef_serverspec_handler_test/default_spec.rb)
 
 ## SUPPORTED RESOURCES
 
