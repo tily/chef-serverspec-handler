@@ -1,0 +1,5 @@
+{
+  "run_list": [
+    "recipe[chef_serverspec_handler_test]"
+  ]
+}

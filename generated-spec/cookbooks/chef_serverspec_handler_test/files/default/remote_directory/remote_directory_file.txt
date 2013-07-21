@@ -1,0 +1,1 @@
+chef serverspec handler remote directory test
