@@ -23,9 +23,29 @@ Then run chef with --whyrun option (for not affecting your working system):
 `chef-serverspec-handler` will be called at the end of the chef run, and generates serverspec examples to
 `/path/to/dir`.
 
-For example, if you have recipe like this,
+ * chef recipe
 
-`chef-serverspec-handler` generates the test like this.
+    template '/var/tmp/template.txt' do
+      source 'template.txt.erb'
+      mode 0777
+      owner 'root'
+      group 'root'
+      variables(:val1 => 'val1', :val2 => 'val2', :val3 => 'val3')
+      action :create
+    end
+
+ * severspec example
+
+    context file('/var/tmp/template.txt') do
+      it {
+        should be_file
+        should be_mode 777
+        should be_owned_by 'root'
+        should contain 'val1'
+        should contain 'val2'
+        should contain 'val3'
+      }
+    end
 
 For more example, see below:
 
