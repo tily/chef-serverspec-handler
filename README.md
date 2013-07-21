@@ -27,12 +27,36 @@ For example, if you have recipe like this,
 
 `chef-serverspec-handler` generates the test like this.
 
-For more example, see `generated-spec/cookbooks/chef_serverspec_handler_test/recipes/default.rb` and `generated-spec/spec/localhost/chef_serverspec_handler_test/default.rb`.
+For more example, see below:
+
+ * [input chef recipe]()
+ * [output serverspec example]()
 
 ## SUPPORTED RESOURCES
 
+ resource name    | actions                          
+ -----------------|----------------------------------
+ file             | create, create_if_missing, touch
+ cookbook_file    | create, create_if_missing
+ remote_file      | create, create_if_missing
+ directory        | create
+ remote_directory | create, create_if_missing
+ template         | create, create_if_missing
+ link             | create
+ user             | create
+ group            | create
+ service          | start, enable
+ cron             | create
+
+## TODO
+
+ * mount
+ * apt_package
+ * dpkg_package
+ * yum_package
+ * rpm_package
 
 ## SEE ALSO
 
- * serverspec
- * chef-handler
+ * [serverspec](http://serverspec.org/)
+ * [About Exception and Report Handlers](http://docs.opscode.com/essentials_handlers.html)
