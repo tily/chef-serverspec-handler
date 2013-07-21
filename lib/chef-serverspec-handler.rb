@@ -56,7 +56,7 @@ class ChefServerspecHandler < Chef::Handler
           next
         end
 
-        Chef::Log.info "generating #{cookbook}/#{recipe}_spec.rb"
+        Chef::Log.info "ChefServerspecHandler: generating #{cookbook}/#{recipe}_spec.rb"
 
         File.open(spec_path, 'w') do |file|
           template = File.read File.join(HERE, 'chef-serverspec-handler.erb')
