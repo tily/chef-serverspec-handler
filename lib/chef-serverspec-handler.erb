@@ -3,47 +3,42 @@ require 'spec_helper'
 describe '<%= cookbook %>::<%= recipe %>' do
 <%- resources.each do |resource| -%>
   <%-
-    if [
-      Chef::Resource::File, 
-      Chef::Resource::CookbookFile,
-      Chef::Resource::RemoteFile,
-      Chef::Resource::Directory,
-      Chef::Resource::RemoteDirectory,
-      Chef::Resource::Template
-    ].include?(resource.class)
+    if [Chef::Resource::File, Chef::Resource::CookbookFile, Chef::Resource::RemoteFile, Chef::Resource::Template].include?(resource.class)
   -%>
   context file('<%= resource.path %>') do
-    it { should be_file }
-    <%- if resource.respond_to?(:content) && resource.content -%>
-    it { should contain <<-EOF
-<%= resource.content %>
-    EOF
-    }
-    <%- end -%>
-    <%- if resource.mode -%>
-    it { should be_mode <%= resource.mode.to_i %> }
-    <%- end -%>
-    <%- if resource.owner -%>
-    it { should be_owned_by '<%= resource.owner %>' }
-    <%- end -%>
-    <%- if resource.group -%>
-    it { should be_group_into '<%= resource.group %>' }
-    <%- end -%>
-    <%- if resource.respond_to?(:variables) && resource.variables && resource.variables.values.size > 0 %>
-      <%- resource.variables.each_value do |value| -%>
-    it { should contain '<%= value %>' }
+    it {
+      should be_file
+      <%- if resource.content -%>
+      should contain <<-EOF
+      <%= resource.content %>
+      EOF
       <%- end -%>
-    <%- end -%>
+      <%- if resource.mode -%>
+      should be_mode <%= resource.mode.class == String ? resource.mode.to_i : resource.mode.to_i.to_s(8).to_i %>
+      <%- end -%>
+      <%- if resource.owner -%>
+      should be_owned_by '<%= resource.owner %>'
+      <%- end -%>
+      <%- if resource.respond_to?(:variables) && resource.variables && resource.variables.values.size > 0 -%>
+      <%- resource.variables.each_value do |value| -%>
+      should contain '<%= value %>'
+      <%- end -%>
+      <%- end -%>
+    }
   end
-  <%-
-    elsif [
-      Chef::Resource::Package,
-      Chef::Resource::AptPackage,
-      Chef::Resource::DpkgPackage,
-      Chef::Resource::YumPackage,
-      Chef::Resource::RpmPackage
-    ].include?(resource.class)
-  -%>
+  <%- elsif [Chef::Resource::Directory, Chef::Resource::RemoteDirectory].include?(resource.class) -%>
+  context file('<%= resource.name %>') do
+    it {
+      should be_directory
+      <%- if resource.mode -%>
+      should be_mode <%= resource.mode.class == String ? resource.mode.to_i : resource.mode.to_i.to_s(8).to_i %>
+      <%- end -%>
+      <%- if resource.owner -%>
+      should be_owned_by '<%= resource.owner %>'
+      <%- end -%>
+    }
+  end
+  <%- elsif resource.class == Chef::Resource::Package -%>
   context package('<%= resource.name %>') do
     it { should be_installed }
   end
@@ -56,15 +51,34 @@ describe '<%= cookbook %>::<%= recipe %>' do
    end
   <%- elsif resource.class == Chef::Resource::Link -%>
   context file('<%= resource.target_file %>') do
-    it { should be_linked_to '<%= resource.to %>' } 
+    it {
+      should be_linked_to '<%= resource.to %>'
+      <%- if resource.owner -%>
+      should be_owned_by '<%= resource.owner %>'
+      <%- end -%>
+    }
   end
   <%- elsif resource.class == Chef::Resource::User -%>
   context user('<%= resource.username %>') do
-    it { should exist }
+    it {
+      should exist
+      <%- if resource.uid -%>
+      should have_uid <%= resource.uid %>
+      <%- end -%>
+      <%- if resource.home -%>
+      should have_home_directory '<%= resource.home %>'
+      <%- end -%>
+      <%- if resource.shell -%>
+      should have_login_shell '<%= resource.shell %>'
+      <%- end -%>
+    }
   end
   <%- elsif resource.class == Chef::Resource::Group -%>
   context group('<%= resource.group_name %>') do
     it { should exist }
+    <%- if resource.gid -%>
+    it { should have_gid <%= resource.gid %> }
+    <%- end -%>
   end
   <%- elsif resource.class == Chef::Resource::Service -%>
   context service('<%= resource.service_name %>') do
@@ -76,7 +90,7 @@ describe '<%= cookbook %>::<%= recipe %>' do
   end
   <%- elsif resource.class == Chef::Resource::Cron -%>
   context cron do
-    it { should have_entry('').with_user('mizzy') }
+    it { should have_entry('<%= resource.minute %> <%= resource.hour %> <%= resource.day %> <%= resource.month %> <%= resource.weekday %> <%= resource.command %>')<%- if resource.user -%>.with_user('<%= resource.user %>')<%- end -%> }
   end
   <%- end -%>
 

@@ -1,4 +1,3 @@
-require 'erubis'
 require 'fileutils'
 require 'chef'
 
@@ -6,7 +5,6 @@ class ChefServerspecHandler < Chef::Handler
 
   HERE =  File.absolute_path File.dirname(__FILE__) 
 
-  # TODO: route, ifconfig, scm, git, subversion, chef_gem, gem_package, easy_install_package
   SUPPORTED_RESOURCES = {
     Chef::Resource::File            => [:create, :create_if_missing, :touch],
     Chef::Resource::CookbookFile    => [:create, :create_if_missing],
@@ -15,11 +13,6 @@ class ChefServerspecHandler < Chef::Handler
     Chef::Resource::RemoteDirectory => [:create, :create_if_missing],
     Chef::Resource::Template        => [:create, :create_if_missing],
     Chef::Resource::Package         => [:install],
-    Chef::Resource::AptPackage      => [:install],
-    Chef::Resource::DpkgPackage     => [:install],
-    Chef::Resource::YumPackage      => [:install],
-    Chef::Resource::RpmPackage      => [:install],
-    Chef::Resource::Mount           => [:mount],
     Chef::Resource::Link            => [:create],
     Chef::Resource::User            => [:create],
     Chef::Resource::Group           => [:create],
