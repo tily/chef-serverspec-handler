@@ -16,9 +16,9 @@ Edit your solo.rb config file to add lines like this:
     
     report_handlers << ChefServerspecHandler.new(:output_dir => '/path/to/dir')
 
-Then run chef with --whyrun option (for not affecting your working system):
+Then run chef with --why-run option (for not affecting your working system):
 
-    chef-solo -c solo.rb -j dna.json --whyrun
+    chef-solo -c solo.rb -j dna.json --why-run
 
 `chef-serverspec-handler` will be called at the end of the chef run, and generates serverspec examples to
 `/path/to/dir`.
