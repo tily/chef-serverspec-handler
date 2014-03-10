@@ -19,7 +19,7 @@ describe '<%= cookbook %>::<%= recipe %>' do
       <%- if resource.owner -%>
       should be_owned_by '<%= resource.owner %>'
       <%- end -%>
-      <%- if resource.respond_to?(:variables) && resource.variables && resource.variables.values.size > 0 -%>
+      <%- if !@options[:safe] && resource.respond_to?(:variables) && resource.variables && resource.variables.values.size > 0 -%>
       <%- resource.variables.each_value do |value| -%>
       should contain '<%= value %>'
       <%- end -%>
