@@ -32,6 +32,7 @@ class ChefServerspecHandler < Chef::Handler
     end
 
     @options[:force] ||= false
+    @options[:safe]  ||= false
   end
 
   def report
